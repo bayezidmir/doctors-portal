@@ -1,0 +1,2 @@
+GDD- Google driven development
+DaisyUI is a tailwind component which can be used like we used to do bootstrap
