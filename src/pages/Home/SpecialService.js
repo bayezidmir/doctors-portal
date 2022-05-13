@@ -1,17 +1,23 @@
 import React from "react";
 import treatment from "../../assets/images/treatment.png";
+import PrimaryButton from "../Shared/PrimaryButton";
 
 const SpecialService = () => {
   return (
-    <div class="max-auto card card-side bg-base-100 shadow-xl ">
-      <figure>
-        <img src={treatment} alt="Movie" class="h-72" />
-      </figure>
-      <div class="card-body  ">
-        <h2 class="card-title">New movie is released!</h2>
-        <p>Click the button to watch on Jetflix app.</p>
-        <button class="btn btn-primary w-40">Watch</button>
-        <div class="card-actions justify-end"></div>
+    <div className="hero min-h-screen ">
+      <div className="hero-content flex-col lg:flex-row">
+        <img src={treatment} className="max-w-sm rounded-lg shadow-2xl" />
+        <div>
+          <h1 className="text-5xl font-bold">
+            Customized Dental Care with State-of-the-Art Technology
+          </h1>
+          <p className="py-6">
+            Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda
+            excepturi exercitationem quasi. In deleniti eaque aut repudiandae et
+            a id nisi.
+          </p>
+          <PrimaryButton>Get Started</PrimaryButton>
+        </div>
       </div>
     </div>
   );
