@@ -1,44 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  useSendPasswordResetEmail,
-  useSignInWithEmailAndPassword,
+  useCreateUserWithEmailAndPassword,
   useSignInWithGoogle,
+  useUpdateProfile,
 } from "react-firebase-hooks/auth";
 import auth from "../../firebase.init";
 import { useForm } from "react-hook-form";
 import Loading from "../Shared/Loading";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  console.log(email);
+const SignUp = () => {
   const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
-  const [signInWithEmailAndPassword, user, loading, error] =
-    useSignInWithEmailAndPassword(auth);
-
-  const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(auth);
+  const [createUserWithEmailAndPassword, user, loading, error] =
+    useCreateUserWithEmailAndPassword(auth);
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm();
+  const [updateProfile, updating, updateError] = useUpdateProfile(auth);
 
   let signInError;
 
-  const onSubmit = (data) => {
-    signInWithEmailAndPassword(data.email, data.password);
-    setEmail(data.email);
+  const navigate = useNavigate();
+  const onSubmit = async (data) => {
+    await createUserWithEmailAndPassword(data.email, data.password);
+    await updateProfile({ displayName: data.name });
+    navigate("/appointment");
+    console.log("updated", data);
   };
 
-  let navigate = useNavigate();
-  let location = useLocation();
-  let from = location.state?.from?.pathname || "/";
-
-  useEffect(() => {
-    if (gUser || user) {
-      navigate(from, { replace: true });
-    }
-  }, [user, gUser, navigate, from]);
+  if (gUser || user) {
+    console.log(user || gUser);
+  }
 
   if (gLoading || loading) {
     return <Loading />;
@@ -48,17 +42,37 @@ const Login = () => {
       <p className="text-red-500"> {gError?.message || error?.message} </p>
     );
   }
-
-  const handlePassReset = async () => {
-    await sendPasswordResetEmail(email);
-  };
-
   return (
     <div className="flex h-screen justify-center items-center">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="text-center text-2xl font-bold">Login</h2>
+          <h2 className="text-center text-2xl font-bold">Sign Up</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-control w-full max-w-xs">
+              <label className="label">
+                <span className="label-text">Name</span>
+              </label>
+              <input
+                autoComplete="off"
+                type="text"
+                placeholder="Your name"
+                className="input input-bordered w-full max-w-xs"
+                {...register("name", {
+                  required: {
+                    value: true,
+                    message: "Name is Required",
+                  },
+                })}
+              />
+              <label className="label">
+                {errors.email?.type === "required" && (
+                  <span className="label-text-alt text-red-500">
+                    {errors.email.message}
+                  </span>
+                )}
+              </label>
+            </div>
+
             <div className="form-control w-full max-w-xs">
               <label className="label">
                 <span className="label-text">Email</span>
@@ -92,6 +106,7 @@ const Login = () => {
                 )}
               </label>
             </div>
+
             <div className="form-control w-full max-w-xs">
               <label className="label">
                 <span className="label-text">Password</span>
@@ -124,23 +139,16 @@ const Login = () => {
                 )}
               </label>
             </div>
-            <p className="mb-3">
-              Forgot password?{" "}
-              <button onClick={handlePassReset} className="text-primary">
-                Reset Password
-              </button>
-            </p>
             {signInError}
             <input
               className="btn w-full max-w-xs text-white"
               type="submit"
-              value="Login"
+              value="Sign Up"
             />
-
             <p className="mt-2">
-              New to Doctors Portal?{" "}
-              <Link to="/signUp" className="text-primary mt-2">
-                Become a Member
+              Already a member?{" "}
+              <Link to="/login" className="text-primary mt-2">
+                Login
               </Link>{" "}
             </p>
           </form>
@@ -158,4 +166,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
